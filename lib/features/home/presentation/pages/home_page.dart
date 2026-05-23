@@ -6,6 +6,7 @@ import 'package:nuran/core/localization/l10n/app_localizations.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/providers/locale_provider.dart';
+import '../../../../shared/widgets/fade_in_on_appear.dart';
 import '../../../hifz/domain/memorization_status.dart';
 import '../../../hifz/presentation/pages/create_plan_page.dart';
 import '../../../hifz/presentation/pages/listen_repeat_page.dart';
@@ -56,9 +57,11 @@ class HomePage extends ConsumerWidget {
             const SizedBox(height: AppSpacing.xl),
 
             if (plan == null)
-              _EmptyPlanCard(
-                onCreate: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const CreatePlanPage()),
+              FadeInOnAppear(
+                child: _EmptyPlanCard(
+                  onCreate: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const CreatePlanPage()),
+                  ),
                 ),
               )
             else ...[

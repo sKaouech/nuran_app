@@ -4,6 +4,8 @@ import 'package:nuran/core/localization/l10n/app_localizations.dart';
 
 import '../../../audio_player/presentation/providers/audio_player_provider.dart';
 import '../../../audio_player/presentation/widgets/reciter_picker.dart';
+import '../../../kids/presentation/pages/parent_pin_page.dart';
+import '../../../kids/presentation/providers/kids_mode_provider.dart';
 import '../../../notifications/notifications_service.dart';
 import '../../../../shared/providers/locale_provider.dart';
 import '../../../../shared/providers/reading_preferences_provider.dart';
@@ -61,6 +63,8 @@ class SettingsPage extends ConsumerWidget {
           _TajwidColorsTile(),
           const Divider(),
           _NotificationsTile(),
+          const Divider(),
+          _KidsModeTile(),
         ],
       ),
     );
@@ -241,6 +245,35 @@ class _NotificationsTile extends ConsumerWidget {
           ),
       ],
     );
+  }
+}
+
+class _KidsModeTile extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(kidsModeProvider);
+    return ListTile(
+      leading: const Icon(Icons.child_care_outlined),
+      title: const Text('Mode enfant'),
+      subtitle: Text(
+        state.hasPinSet
+            ? 'PIN parental défini · Bascule en interface Madrasa'
+            : 'Définir un PIN parental pour activer',
+      ),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => _enterKidsMode(context, ref),
+    );
+  }
+
+  Future<void> _enterKidsMode(BuildContext context, WidgetRef ref) async {
+    final state = ref.read(kidsModeProvider);
+    if (!state.hasPinSet) {
+      final ok = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(builder: (_) => ParentPinPage.setup()),
+      );
+      if (ok != true) return;
+    }
+    await ref.read(kidsModeProvider.notifier).enterKidsMode();
   }
 }
 
