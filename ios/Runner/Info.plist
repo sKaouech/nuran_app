@@ -53,6 +53,10 @@
 	<array>
 		<string>audio</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Nuran utilise le microphone pour écouter votre récitation et vous aider à mémoriser le Coran.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Nuran utilise la reconnaissance vocale pour vérifier votre récitation du Coran et détecter d'éventuelles erreurs.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

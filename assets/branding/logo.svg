@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Logo Nuran
+  - Cercle de fond : vert sapin (#1B5E4F) — couleur primaire "Calm Islamic"
+  - Étoile/lumière intérieure : or sobre (#B8860B) — symbolise la lumière (Nūr)
+  - Lettre arabe ن (nūn) : crème (#FFFBF5) — initiale de Nuran/Nūr
+  - Forme inspirée du croissant + étoile, symboles islamiques classiques
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Fond circulaire vert sapin -->
+  <circle cx="512" cy="512" r="512" fill="#1B5E4F"/>
+
+  <!-- Halo de lumière (cercle plus clair, transparence) -->
+  <circle cx="512" cy="512" r="420" fill="none" stroke="#B8860B" stroke-width="3" opacity="0.4"/>
+  <circle cx="512" cy="512" r="380" fill="none" stroke="#B8860B" stroke-width="2" opacity="0.25"/>
+
+  <!-- Étoile à 8 branches en arrière-plan, or pâle -->
+  <g opacity="0.18" fill="#B8860B">
+    <polygon points="512,140 540,420 820,452 540,484 512,884 484,484 204,452 484,420"/>
+    <polygon transform="rotate(45 512 512)" points="512,200 535,489 780,512 535,535 512,824 489,535 244,512 489,489"/>
+  </g>
+
+  <!-- Lettre ن (nūn) stylisée en grand -->
+  <!-- Le ن classique : un demi-cercle ouvert vers le bas avec un point au-dessus -->
+  <g fill="#FFFBF5">
+    <!-- Bol du nūn (demi-cercle) -->
+    <path d="M 300 470
+             Q 300 720, 512 720
+             Q 724 720, 724 470
+             L 670 470
+             Q 670 670, 512 670
+             Q 354 670, 354 470
+             Z"
+          stroke-linejoin="round"/>
+
+    <!-- Point du nūn (au-dessus, centré) -->
+    <circle cx="512" cy="370" r="42"/>
+  </g>
+
+  <!-- Petit rayon de lumière or sous le ن pour évoquer "nūr" -->
+  <line x1="512" y1="760" x2="512" y2="830" stroke="#B8860B" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+  <line x1="442" y1="780" x2="412" y2="820" stroke="#B8860B" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+  <line x1="582" y1="780" x2="612" y2="820" stroke="#B8860B" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+</svg>

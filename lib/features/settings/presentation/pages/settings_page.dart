@@ -58,6 +58,7 @@ class SettingsPage extends ConsumerWidget {
           ),
           const Divider(),
           _FontScaleTile(),
+          _TajwidColorsTile(),
           const Divider(),
           _NotificationsTile(),
         ],
@@ -239,6 +240,24 @@ class _NotificationsTile extends ConsumerWidget {
             },
           ),
       ],
+    );
+  }
+}
+
+class _TajwidColorsTile extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final prefs = ref.watch(readingPreferencesProvider);
+    return SwitchListTile(
+      secondary: const Icon(Icons.format_color_text_outlined),
+      title: const Text('Tajwid coloré'),
+      subtitle: const Text(
+        'Madd (vert) · Ghunnah (orange) · Qalqalah (violet)',
+      ),
+      value: prefs.tajwidColorsEnabled,
+      onChanged: (v) => ref
+          .read(readingPreferencesProvider.notifier)
+          .setTajwidColorsEnabled(v),
     );
   }
 }

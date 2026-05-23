@@ -9,6 +9,7 @@ import '../../../audio_player/presentation/widgets/verse_audio_menu.dart';
 import '../../../bookmarks/presentation/widgets/bookmark_button.dart';
 import '../../../hifz/presentation/widgets/memorization_button.dart';
 import '../../domain/entities/verse.dart';
+import 'ayah_text.dart';
 
 class AyahCard extends ConsumerWidget {
   const AyahCard({
@@ -68,17 +69,13 @@ class AyahCard extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.md),
-            Directionality(
-              textDirection: TextDirection.rtl,
-              child: Text(
-                verse.arabicText,
-                style: AppTypography.ayahMedium(theme.colorScheme.onSurface)
-                    .copyWith(
-                  fontSize: 24 *
-                      ref.watch(readingPreferencesProvider).fontScale,
-                ),
-                textAlign: TextAlign.right,
-              ),
+            AyahText(
+              text: verse.arabicText,
+              tajwidColorsEnabled: ref
+                  .watch(readingPreferencesProvider)
+                  .tajwidColorsEnabled,
+              fontSize: 24 *
+                  ref.watch(readingPreferencesProvider).fontScale,
             ),
             if (translation != null) ...[
               const SizedBox(height: AppSpacing.md),

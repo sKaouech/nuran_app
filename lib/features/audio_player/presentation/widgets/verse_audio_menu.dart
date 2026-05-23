@@ -5,6 +5,7 @@ import 'package:nuran/core/localization/l10n/app_localizations.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../hifz/presentation/pages/listen_repeat_page.dart';
 import '../../../quran_reader/domain/entities/verse.dart';
+import '../../../tajwid_asr/presentation/pages/recitation_check_page.dart';
 import '../providers/audio_player_provider.dart';
 import 'reciter_picker.dart';
 
@@ -106,7 +107,21 @@ class _VerseAudioMenuState extends ConsumerState<_VerseAudioMenu> {
                 );
               },
               icon: const Icon(Icons.school),
-              label: const Text('Mode Hifz (Écoute &amp; Répète)'),
+              label: const Text('Mode Hifz (Écoute & Répète)'),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            FilledButton.tonalIcon(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        RecitationCheckPage(verse: widget.verse),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.mic),
+              label: const Text('Vérifier ma récitation (ASR)'),
             ),
             const SizedBox(height: AppSpacing.sm),
             OutlinedButton.icon(
