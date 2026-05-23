@@ -1,0 +1,44 @@
+{
+  "@@locale": "ar",
+  "appName": "نوران",
+  "tabHome": "الرئيسية",
+  "tabRead": "قراءة",
+  "tabHifz": "الحفظ",
+  "tabMurajaa": "المراجعة",
+  "tabSettings": "الإعدادات",
+
+  "greetingMorning": "السلام عليكم",
+  "greetingEvening": "السلام عليكم",
+  "todayPlan": "خطة اليوم",
+  "versesToMemorize": "آيات للحفظ",
+  "versesToReview": "آيات للمراجعة",
+  "currentStreak": "{days, plural, =0{بدون أيام} =1{يوم واحد} other{{days} أيام}} متتالية",
+
+  "continueMemorizing": "متابعة الحفظ",
+  "startReview": "بدء المراجعة",
+  "openMushaf": "فتح المصحف",
+
+  "settingsLanguage": "اللغة",
+  "settingsTheme": "السمة",
+  "settingsReciter": "القارئ الافتراضي",
+  "settingsTranslation": "الترجمة الافتراضية",
+  "themeLight": "فاتح",
+  "themeDark": "داكن",
+  "themeSepia": "بني داكن (قراءة)",
+  "themeSystem": "النظام",
+
+  "emptyStatePlanTitle": "لا توجد خطة حالية",
+  "emptyStatePlanDescription": "ابدأ خطة الحفظ المخصصة لك لبدء رحلة حفظ القرآن.",
+  "emptyStatePlanCta": "إنشاء خطتي",
+
+  "comingSoon": "قريباً",
+
+  "audioSpeed": "السرعة",
+  "audioRepeat": "التكرار",
+  "audioReciter": "القارئ",
+  "audioPlayFromHere": "ابدأ من هنا",
+  "audioPlayRange": "نطاق التشغيل",
+  "audioOnce": "مرة واحدة",
+  "audioRepeatN": "{n, plural, =1{مرة واحدة} other{{n} مرات}}",
+  "reciterSlowBadge": "بطيء (تعليم)"
+}

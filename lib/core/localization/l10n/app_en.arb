@@ -1,0 +1,44 @@
+{
+  "@@locale": "en",
+  "appName": "Nuran",
+  "tabHome": "Home",
+  "tabRead": "Read",
+  "tabHifz": "Hifz",
+  "tabMurajaa": "Murajaa",
+  "tabSettings": "Settings",
+
+  "greetingMorning": "As-salāmu ʿalaykum",
+  "greetingEvening": "As-salāmu ʿalaykum",
+  "todayPlan": "Your plan today",
+  "versesToMemorize": "Verses to memorize",
+  "versesToReview": "Verses to review",
+  "currentStreak": "{days, plural, =0{No days} =1{1 day} other{{days} days}} streak",
+
+  "continueMemorizing": "Continue memorizing",
+  "startReview": "Start review",
+  "openMushaf": "Open mushaf",
+
+  "settingsLanguage": "Language",
+  "settingsTheme": "Theme",
+  "settingsReciter": "Default reciter",
+  "settingsTranslation": "Default translation",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSepia": "Sepia (reading)",
+  "themeSystem": "System",
+
+  "emptyStatePlanTitle": "No active plan",
+  "emptyStatePlanDescription": "Start your personalized memorization plan to begin your Hifz journey.",
+  "emptyStatePlanCta": "Create my plan",
+
+  "comingSoon": "Coming soon",
+
+  "audioSpeed": "Speed",
+  "audioRepeat": "Repeats",
+  "audioReciter": "Reciter",
+  "audioPlayFromHere": "Play from here",
+  "audioPlayRange": "Play range",
+  "audioOnce": "Play once",
+  "audioRepeatN": "{n, plural, =1{1 time} other{{n} times}}",
+  "reciterSlowBadge": "Slow (learning)"
+}

@@ -1,0 +1,54 @@
+{
+  "@@locale": "fr",
+  "appName": "Nuran",
+  "tabHome": "Accueil",
+  "tabRead": "Lire",
+  "tabHifz": "Hifz",
+  "tabMurajaa": "Murajaa",
+  "tabSettings": "Réglages",
+
+  "greetingMorning": "As-salāmu ʿalaykum",
+  "greetingEvening": "As-salāmu ʿalaykum",
+  "todayPlan": "Votre plan du jour",
+  "versesToMemorize": "Versets à mémoriser",
+  "versesToReview": "Versets à réviser",
+  "currentStreak": "{days, plural, =0{Aucun jour} =1{1 jour} other{{days} jours}} de suite",
+  "@currentStreak": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+
+  "continueMemorizing": "Continuer la mémorisation",
+  "startReview": "Commencer la révision",
+  "openMushaf": "Ouvrir le mushaf",
+
+  "settingsLanguage": "Langue",
+  "settingsTheme": "Thème",
+  "settingsReciter": "Récitateur par défaut",
+  "settingsTranslation": "Traduction par défaut",
+  "themeLight": "Clair",
+  "themeDark": "Sombre",
+  "themeSepia": "Sépia (lecture)",
+  "themeSystem": "Système",
+
+  "emptyStatePlanTitle": "Aucun plan en cours",
+  "emptyStatePlanDescription": "Démarrez votre plan de mémorisation personnalisé pour commencer le voyage du Hifz.",
+  "emptyStatePlanCta": "Créer mon plan",
+
+  "comingSoon": "Bientôt disponible",
+
+  "audioSpeed": "Vitesse",
+  "audioRepeat": "Répétitions",
+  "audioReciter": "Récitateur",
+  "audioPlayFromHere": "Lire à partir d'ici",
+  "audioPlayRange": "Lire une plage",
+  "audioOnce": "Lecture unique",
+  "audioRepeatN": "{n, plural, =1{1 fois} other{{n} fois}}",
+  "@audioRepeatN": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "reciterSlowBadge": "Lent (apprentissage)"
+}
