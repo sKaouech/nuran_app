@@ -36,9 +36,17 @@ class _FsrsSessionPageState extends ConsumerState<FsrsSessionPage> {
     _initialQueue = List<Verse>.from(ref.read(murajaaQueueProvider));
   }
 
+  AudioPlayerController? _audioController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _audioController ??= ref.read(audioPlayerProvider.notifier);
+  }
+
   @override
   void dispose() {
-    ref.read(audioPlayerProvider.notifier).stop();
+    _audioController?.stop();
     super.dispose();
   }
 

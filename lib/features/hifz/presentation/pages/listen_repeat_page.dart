@@ -28,11 +28,16 @@ class _ListenRepeatPageState extends ConsumerState<ListenRepeatPage> {
   /// Pourcentage du texte masqué (0 = tout visible, 100 = tout masqué).
   double _maskPercent = 0;
 
+  AudioPlayerController? _audioController;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(audioPlayerProvider.notifier)
+      if (!mounted) return;
+      final controller = ref.read(audioPlayerProvider.notifier);
+      _audioController = controller;
+      controller
         ..setRepeatCount(10)
         ..playVerse(
           surah: widget.verse.surahNumber,
@@ -43,7 +48,7 @@ class _ListenRepeatPageState extends ConsumerState<ListenRepeatPage> {
 
   @override
   void dispose() {
-    ref.read(audioPlayerProvider.notifier).stop();
+    _audioController?.stop();
     super.dispose();
   }
 

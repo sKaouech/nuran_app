@@ -25,9 +25,17 @@ class _ReviewSessionPageState extends ConsumerState<ReviewSessionPage> {
   int _reviewedCount = 0;
   int _markedMemorized = 0;
 
+  AudioPlayerController? _audioController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _audioController ??= ref.read(audioPlayerProvider.notifier);
+  }
+
   @override
   void dispose() {
-    ref.read(audioPlayerProvider.notifier).stop();
+    _audioController?.stop();
     super.dispose();
   }
 

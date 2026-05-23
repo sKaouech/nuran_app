@@ -30,11 +30,17 @@ class _RecitationCheckPageState extends ConsumerState<RecitationCheckPage> {
   bool _initializing = true;
   bool _asrAvailable = false;
 
+  /// On garde une référence locale au controller pour pouvoir appeler `cancel`
+  /// depuis `dispose` sans passer par `ref` (qui est déjà disposed à ce stade).
+  AsrController? _asrController;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final ok = await ref.read(asrControllerProvider.notifier).initialize();
+      if (!mounted) return;
+      _asrController = ref.read(asrControllerProvider.notifier);
+      final ok = await _asrController!.initialize();
       if (mounted) {
         setState(() {
           _initializing = false;
@@ -46,7 +52,8 @@ class _RecitationCheckPageState extends ConsumerState<RecitationCheckPage> {
 
   @override
   void dispose() {
-    ref.read(asrControllerProvider.notifier).cancel();
+    // On utilise la référence capturée, pas ref.read() (Riverpod déjà disposed).
+    _asrController?.cancel();
     super.dispose();
   }
 
