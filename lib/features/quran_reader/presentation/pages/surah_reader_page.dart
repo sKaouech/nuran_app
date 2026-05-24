@@ -61,7 +61,7 @@ class SurahReaderPage extends ConsumerWidget {
               vertical: AppSpacing.xl,
             ),
             itemCount: verses.length + 1,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.lg),
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.lg),
             itemBuilder: (context, index) {
               if (index == 0) {
                 // Bismillah ou en-tête sourate

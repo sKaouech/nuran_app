@@ -192,8 +192,8 @@ class AsrController extends StateNotifier<AsrState> {
           listenMode: stt.ListenMode.dictation,
           partialResults: true,
           cancelOnError: false,
+          localeId: locale,
         ),
-        localeId: locale,
         onResult: (result) {
           if (kDebugMode && result.finalResult) {
             debugPrint('[ASR] final: ${result.recognizedWords}');

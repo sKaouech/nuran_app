@@ -100,7 +100,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           return ListView.separated(
             padding: const EdgeInsets.all(AppSpacing.lg),
             itemCount: _results.length,
-            separatorBuilder: (_, __) =>
+            separatorBuilder: (_, _) =>
                 const SizedBox(height: AppSpacing.md),
             itemBuilder: (context, i) {
               final r = _results[i];

@@ -94,6 +94,7 @@ void main() {
     final file = File('assets/branding/icon.png');
     await file.parent.create(recursive: true);
     await file.writeAsBytes(bytes);
+    // ignore: avoid_print
     print('✓ Icône générée : ${file.path} (${bytes.length} bytes)');
   });
 }
