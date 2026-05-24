@@ -14,6 +14,7 @@ class AsrState {
     this.errorMessage,
     this.activeLocaleId,
     this.availableLocales = const [],
+    this.micPermanentlyDenied = false,
   });
 
   final bool isListening;
@@ -26,12 +27,17 @@ class AsrState {
   /// Liste des locales détectées sur l'appareil (pour debug).
   final List<String> availableLocales;
 
+  /// True si l'utilisateur a refusé définitivement la permission micro.
+  /// Dans ce cas il faut ouvrir les Réglages système pour la réactiver.
+  final bool micPermanentlyDenied;
+
   AsrState copyWith({
     bool? isListening,
     bool? isAvailable,
     String? errorMessage,
     String? activeLocaleId,
     List<String>? availableLocales,
+    bool? micPermanentlyDenied,
     bool clearError = false,
   }) {
     return AsrState(
@@ -40,6 +46,7 @@ class AsrState {
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       activeLocaleId: activeLocaleId ?? this.activeLocaleId,
       availableLocales: availableLocales ?? this.availableLocales,
+      micPermanentlyDenied: micPermanentlyDenied ?? this.micPermanentlyDenied,
     );
   }
 }
@@ -60,16 +67,28 @@ class AsrController extends StateNotifier<AsrState> {
   Future<bool> initialize() async {
     try {
       // 1. Demande explicite des permissions (micro + reconnaissance vocale)
-      if (await Permission.microphone.request() != PermissionStatus.granted) {
+      final micStatus = await Permission.microphone.request();
+      if (kDebugMode) {
+        debugPrint('[ASR] mic permission: $micStatus');
+      }
+      if (micStatus != PermissionStatus.granted) {
         state = state.copyWith(
           isAvailable: false,
-          errorMessage: 'Permission micro refusée',
+          micPermanentlyDenied: micStatus.isPermanentlyDenied ||
+              micStatus.isRestricted ||
+              micStatus.isDenied,
+          errorMessage: micStatus.isPermanentlyDenied
+              ? 'Permission micro refusée définitivement. Activez-la dans les Réglages.'
+              : 'Permission micro refusée',
         );
         return false;
       }
       // Sur iOS, la reconnaissance vocale a aussi sa propre permission
       if (defaultTargetPlatform == TargetPlatform.iOS) {
-        await Permission.speech.request();
+        final speechStatus = await Permission.speech.request();
+        if (kDebugMode) {
+          debugPrint('[ASR] speech permission: $speechStatus');
+        }
       }
 
       // 2. Init du moteur speech_to_text
@@ -191,6 +210,12 @@ class AsrController extends StateNotifier<AsrState> {
         errorMessage: 'Échec démarrage écoute : $e',
       );
     }
+  }
+
+  /// Ouvre les Réglages système de l'app pour permettre à l'utilisateur de
+  /// réactiver la permission micro (cas iOS quand refusée définitivement).
+  Future<void> openSystemSettings() async {
+    await openAppSettings();
   }
 
   Future<void> stopListening() async {

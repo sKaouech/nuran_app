@@ -316,24 +316,29 @@ class _RecitationCheckPageState extends ConsumerState<RecitationCheckPage> {
   }
 }
 
-class _UnavailableView extends StatelessWidget {
+class _UnavailableView extends ConsumerWidget {
   const _UnavailableView({required this.theme});
   final ThemeData theme;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asr = ref.watch(asrControllerProvider);
+    final isPermDenied = asr.micPermanentlyDenied;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.mic_off_outlined,
+            isPermDenied ? Icons.mic_off_outlined : Icons.help_outline,
             size: 64,
             color: Theme.of(context).colorScheme.error,
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'Reconnaissance vocale indisponible',
+            isPermDenied
+                ? 'Microphone non autorisé'
+                : 'Reconnaissance vocale indisponible',
             style: theme.textTheme.titleMedium,
             textAlign: TextAlign.center,
           ),
@@ -342,13 +347,31 @@ class _UnavailableView extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             child: Text(
-              'Vérifiez que vous avez autorisé Nuran à utiliser le microphone et que l\'arabe est installé dans vos langues système.',
+              isPermDenied
+                  ? 'Nuran a besoin du microphone pour écouter votre récitation. Activez la permission dans les Réglages système.'
+                  : 'Vérifiez que vous avez autorisé Nuran à utiliser le microphone et que l\'arabe est installé dans vos langues système.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
           ),
+          const SizedBox(height: AppSpacing.xl),
+          if (isPermDenied)
+            FilledButton.icon(
+              onPressed: () => ref
+                  .read(asrControllerProvider.notifier)
+                  .openSystemSettings(),
+              icon: const Icon(Icons.settings),
+              label: const Text('Ouvrir les Réglages'),
+            )
+          else
+            OutlinedButton.icon(
+              onPressed: () =>
+                  ref.read(asrControllerProvider.notifier).initialize(),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Réessayer'),
+            ),
         ],
       ),
     );
