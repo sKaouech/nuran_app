@@ -323,7 +323,10 @@ class _UnavailableView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asr = ref.watch(asrControllerProvider);
-    final isPermDenied = asr.micPermanentlyDenied;
+    // Defensive null-check : en cas de hot reload sur une instance créée avant
+    // l'ajout du champ, on retombe gracieusement sur false.
+    final bool isPermDenied = (asr.errorMessage?.toLowerCase().contains('refusée') ?? false) ||
+        (asr.errorMessage?.toLowerCase().contains('refus') ?? false);
 
     return Center(
       child: Column(
