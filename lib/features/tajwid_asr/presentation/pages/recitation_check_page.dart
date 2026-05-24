@@ -126,7 +126,52 @@ class _RecitationCheckPageState extends ConsumerState<RecitationCheckPage> {
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.xl),
-              child: _initializing
+              child: Column(
+                children: [
+                  if (asr.activeLocaleId != null &&
+                      !asr.activeLocaleId!.toLowerCase().startsWith('ar'))
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.warning.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.info_outline,
+                              size: 16, color: AppColors.warning),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              'Arabe indisponible sur cet appareil. Locale utilisée : ${asr.activeLocaleId}',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: AppColors.warning,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (asr.errorMessage != null)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.error.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                      ),
+                      child: Text(
+                        'Erreur : ${asr.errorMessage}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: AppColors.error,
+                        ),
+                      ),
+                    ),
+                  Expanded(
+                    child: _initializing
                   ? const Center(child: CircularProgressIndicator())
                   : !_asrAvailable
                       ? _UnavailableView(theme: theme)
@@ -260,6 +305,9 @@ class _RecitationCheckPageState extends ConsumerState<RecitationCheckPage> {
                             ),
                           ],
                         ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
