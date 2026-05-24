@@ -52,8 +52,12 @@ class _RecitationCheckPageState extends ConsumerState<RecitationCheckPage> {
 
   @override
   void dispose() {
-    // On utilise la référence capturée, pas ref.read() (Riverpod déjà disposed).
-    _asrController?.cancel();
+    // Différer la mutation du state notifier APRÈS le dispose, sinon elle
+    // déclencherait markNeedsBuild sur des widgets en cours de destruction.
+    final controller = _asrController;
+    if (controller != null) {
+      Future.microtask(controller.cancel);
+    }
     super.dispose();
   }
 

@@ -46,7 +46,12 @@ class _FsrsSessionPageState extends ConsumerState<FsrsSessionPage> {
 
   @override
   void dispose() {
-    _audioController?.stop();
+    // Différer la mutation du state notifier APRÈS le dispose, sinon elle
+    // déclencherait markNeedsBuild sur des widgets en cours de destruction.
+    final controller = _audioController;
+    if (controller != null) {
+      Future.microtask(controller.stop);
+    }
     super.dispose();
   }
 
