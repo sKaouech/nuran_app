@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:nuran/core/localization/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nuran/core/localization/l10n/app_localizations.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
-import 'features/kids/presentation/pages/madrasa_page.dart';
-import 'features/kids/presentation/providers/kids_mode_provider.dart';
 import 'shared/providers/locale_provider.dart';
 import 'shared/providers/theme_mode_provider.dart';
+
+/// Le router est exposé via un provider pour pouvoir injecter `ref` dedans
+/// (et écouter les changements de kidsMode pour rediriger).
+final _routerProvider = Provider<GoRouter>((ref) => buildRouter(ref));
 
 class NuranApp extends ConsumerWidget {
   const NuranApp({super.key});
@@ -16,26 +19,11 @@ class NuranApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeProvider);
     final themeMode = ref.watch(themeModeProvider);
-    final kidsState = ref.watch(kidsModeProvider);
+    final router = ref.watch(_routerProvider);
 
     // Mode sépia : on substitue le theme "light" par sépia.
     final lightTheme =
         themeMode == AppThemeMode.sepia ? AppTheme.sepia : AppTheme.light;
-
-    // Mode enfant : on bascule sur une app simplifiée sans router complexe.
-    if (kidsState.kidsModeEnabled) {
-      return MaterialApp(
-        title: 'Nuran',
-        debugShowCheckedModeBanner: false,
-        theme: lightTheme,
-        darkTheme: AppTheme.dark,
-        themeMode: themeMode.materialMode,
-        locale: locale,
-        supportedLocales: supportedLocales,
-        localizationsDelegates: AppL10n.localizationsDelegates,
-        home: const MadrasaPage(),
-      );
-    }
 
     return MaterialApp.router(
       title: 'Nuran',
@@ -46,9 +34,7 @@ class NuranApp extends ConsumerWidget {
       locale: locale,
       supportedLocales: supportedLocales,
       localizationsDelegates: AppL10n.localizationsDelegates,
-      routerConfig: _router,
+      routerConfig: router,
     );
   }
 }
-
-final _router = buildRouter();

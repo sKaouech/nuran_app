@@ -7,4 +7,5 @@ class Routes {
   static const hifz = '/hifz';
   static const murajaa = '/murajaa';
   static const settings = '/settings';
+  static const madrasa = '/madrasa';
 }
