@@ -4,6 +4,7 @@ import 'package:nuran/core/localization/l10n/app_localizations.dart';
 
 import '../../../audio_player/presentation/providers/audio_player_provider.dart';
 import '../../../audio_player/presentation/widgets/reciter_picker.dart';
+import '../../../downloads/presentation/pages/downloads_page.dart';
 import '../../../kids/presentation/pages/parent_pin_page.dart';
 import '../../../kids/presentation/providers/kids_mode_provider.dart';
 import '../../../notifications/notifications_service.dart';
@@ -49,6 +50,15 @@ class SettingsPage extends ConsumerWidget {
                   : audioState.reciter.nameEnglish,
             ),
             onTap: () => showReciterPicker(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.download_outlined),
+            title: const Text('Téléchargements audio'),
+            subtitle: const Text('Gérer les sourates hors ligne'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const DownloadsPage()),
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.translate),

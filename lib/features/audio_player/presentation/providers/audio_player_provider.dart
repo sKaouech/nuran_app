@@ -7,6 +7,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../shared/providers/locale_provider.dart';
+import '../../../downloads/data/audio_download_service.dart';
 import '../../data/reciter_catalog.dart';
 import '../../domain/entities/reciter.dart';
 
@@ -145,11 +146,21 @@ class AudioPlayerController extends StateNotifier<AudioPlayerState> {
     if (!state.hasActiveVerse) return;
     state = state.copyWith(isLoading: true);
     try {
-      final url = state.reciter.audioUrlFor(
+      // Local-first : si le fichier est téléchargé on l'utilise, sinon URL.
+      final localFile = await AudioDownloadService.instance.existingLocalFile(
+        reciterId: state.reciter.id,
         surah: state.currentSurah!,
         ayah: state.currentAyah!,
       );
-      await _player.setUrl(url);
+      if (localFile != null) {
+        await _player.setFilePath(localFile.path);
+      } else {
+        final url = state.reciter.audioUrlFor(
+          surah: state.currentSurah!,
+          ayah: state.currentAyah!,
+        );
+        await _player.setUrl(url);
+      }
       await _player.setSpeed(state.speed);
       await _player.play();
       state = state.copyWith(isPlaying: true, isLoading: false);
