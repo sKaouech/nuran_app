@@ -67,13 +67,14 @@ class _RecitationCheckPageState extends ConsumerState<RecitationCheckPage> {
   }
 
   Future<void> _stopAndAnalyze() async {
-    final asr = ref.read(asrControllerProvider);
-    await ref.read(asrControllerProvider.notifier).stopListening();
-    final recognized = asr.recognizedText;
+    final controller = ref.read(asrControllerProvider.notifier);
+    final recognized = controller.recognizedText.value;
+    await controller.stopListening();
     final result = ArabicTextMatcher.compare(
       expected: widget.verse.arabicText,
       recognized: recognized,
     );
+    if (!mounted) return;
     setState(() => _result = result);
 
     // Log activité + notation FSRS automatique selon le score
@@ -141,67 +142,84 @@ class _RecitationCheckPageState extends ConsumerState<RecitationCheckPage> {
                             ),
 
                             // Zone de transcription en cours
-                            if (asr.isListening || asr.recognizedText.isNotEmpty)
-                              Container(
-                                width: double.infinity,
-                                margin: const EdgeInsets.symmetric(
-                                  vertical: AppSpacing.md,
-                                ),
-                                padding: const EdgeInsets.all(AppSpacing.md),
-                                decoration: BoxDecoration(
-                                  color:
-                                      theme.colorScheme.surfaceContainerHigh,
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusMd,
+                            // On utilise ValueListenableBuilder isolé pour
+                            // s'abonner au texte reconnu (haute fréquence)
+                            // sans déclencher de rebuild Riverpod du widget
+                            // parent.
+                            ValueListenableBuilder<String>(
+                              valueListenable: ref
+                                  .read(asrControllerProvider.notifier)
+                                  .recognizedText,
+                              builder: (context, recognized, _) {
+                                if (!asr.isListening &&
+                                    recognized.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Container(
+                                  width: double.infinity,
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: AppSpacing.md,
                                   ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        if (asr.isListening) ...[
-                                          Icon(
-                                            Icons.mic,
-                                            size: 16,
-                                            color: AppColors.error,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            'Écoute en cours…',
-                                            style: theme.textTheme.labelSmall
-                                                ?.copyWith(
+                                  padding:
+                                      const EdgeInsets.all(AppSpacing.md),
+                                  decoration: BoxDecoration(
+                                    color: theme
+                                        .colorScheme.surfaceContainerHigh,
+                                    borderRadius: BorderRadius.circular(
+                                      AppSpacing.radiusMd,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          if (asr.isListening) ...[
+                                            Icon(
+                                              Icons.mic,
+                                              size: 16,
                                               color: AppColors.error,
                                             ),
-                                          ),
-                                        ] else
-                                          Text(
-                                            'Reconnu',
-                                            style: theme.textTheme.labelSmall
-                                                ?.copyWith(
-                                              color: theme.colorScheme
-                                                  .onSurfaceVariant,
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              'Écoute en cours…',
+                                              style: theme
+                                                  .textTheme.labelSmall
+                                                  ?.copyWith(
+                                                color: AppColors.error,
+                                              ),
                                             ),
-                                          ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Directionality(
-                                      textDirection: TextDirection.rtl,
-                                      child: Text(
-                                        asr.recognizedText.isEmpty
-                                            ? '…'
-                                            : asr.recognizedText,
-                                        style: AppTypography.ayahSmall(
-                                          theme.colorScheme.onSurface,
-                                        ),
-                                        textAlign: TextAlign.right,
+                                          ] else
+                                            Text(
+                                              'Reconnu',
+                                              style: theme
+                                                  .textTheme.labelSmall
+                                                  ?.copyWith(
+                                                color: theme.colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
+                                            ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                                      const SizedBox(height: 4),
+                                      Directionality(
+                                        textDirection: TextDirection.rtl,
+                                        child: Text(
+                                          recognized.isEmpty
+                                              ? '…'
+                                              : recognized,
+                                          style: AppTypography.ayahSmall(
+                                            theme.colorScheme.onSurface,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
 
                             // Score si résultat dispo
                             if (_result != null) ...[
