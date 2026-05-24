@@ -84,3 +84,6 @@ flutter:
     - assets/data/verses_ar_uthmani.json
     - assets/data/translation_fr_hamidullah.json
     - assets/data/translation_en_sahih.json
+    - assets/data/tafsir_muyassar_ar.json
+    - assets/data/tafsir_jalalayn_ar.json
+    - assets/data/tafsir_maududi_en.json

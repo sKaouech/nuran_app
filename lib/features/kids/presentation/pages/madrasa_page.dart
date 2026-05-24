@@ -8,6 +8,8 @@ import '../../../quran_reader/data/quran_repository.dart';
 import '../../../quran_reader/presentation/pages/surah_reader_page.dart';
 import '../../../../shared/widgets/fade_in_on_appear.dart';
 import '../providers/kids_mode_provider.dart';
+import '../providers/kids_stars_provider.dart';
+import 'kids_quiz_page.dart';
 import 'parent_pin_page.dart';
 
 /// Madrasa = page d'accueil enfant.
@@ -131,6 +133,71 @@ class _MadrasaPageState extends ConsumerState<MadrasaPage> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: AppSpacing.md),
+                    // Bandeau étoiles + bouton Quiz
+                    Row(
+                      children: [
+                        Consumer(builder: (context, ref, _) {
+                          final stars = ref.watch(kidsStarsProvider);
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: AppSpacing.sm,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFB8860B),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusFull / 2,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.star,
+                                    color: Colors.white, size: 16),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '$stars',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  kidsBadgeLabel(stars),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                        const Spacer(),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFFFBF5),
+                            foregroundColor: const Color(0xFF1B5E4F),
+                            elevation: 0,
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const KidsQuizPage(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.quiz_outlined, size: 18),
+                          label: const Text(
+                            'Quiz',
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -157,6 +224,8 @@ class _MadrasaPageState extends ConsumerState<MadrasaPage> {
                         versesCount: surah.versesCount,
                         cardColor: color,
                         onTap: () {
+                          // Récompense : 1 étoile pour avoir ouvert une sourate
+                          ref.read(kidsStarsProvider.notifier).award(1);
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => SurahReaderPage(
