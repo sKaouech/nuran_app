@@ -7,6 +7,8 @@ import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/kids/presentation/pages/madrasa_page.dart';
 import '../../features/kids/presentation/providers/kids_mode_provider.dart';
 import '../../features/murajaa/presentation/pages/murajaa_page.dart';
+import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+import '../../features/onboarding/presentation/providers/onboarding_provider.dart';
 import '../../features/quran_reader/presentation/pages/quran_reader_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
@@ -16,26 +18,49 @@ import 'routes.dart';
 /// `Listenable` pour `refreshListenable`. Quand le provider change, le router
 /// re-évalue ses redirects.
 class RiverpodListenable extends ChangeNotifier {
-  RiverpodListenable(Ref ref, ProviderBase<Object?> provider) {
-    ref.listen<Object?>(provider, (_, _) => notifyListeners());
+  RiverpodListenable(Ref ref, List<ProviderBase<Object?>> providers) {
+    for (final provider in providers) {
+      ref.listen<Object?>(provider, (_, _) => notifyListeners());
+    }
   }
 }
 
 GoRouter buildRouter(Ref ref) {
   return GoRouter(
     initialLocation: Routes.home,
-    refreshListenable: RiverpodListenable(ref, kidsModeProvider),
+    refreshListenable: RiverpodListenable(ref, [
+      kidsModeProvider,
+      onboardingCompletedProvider,
+    ]),
     redirect: (context, state) {
-      final kidsEnabled = ref.read(kidsModeProvider).kidsModeEnabled;
-      final isOnMadrasa = state.matchedLocation == Routes.madrasa;
+      final loc = state.matchedLocation;
 
-      // Mode enfant actif : on force /madrasa (sauf si déjà dessus)
-      if (kidsEnabled && !isOnMadrasa) return Routes.madrasa;
-      // Mode enfant désactivé mais on est sur /madrasa : retour home
+      // 1. Onboarding non vu → on force /onboarding
+      final onboardingDone = ref.read(onboardingCompletedProvider);
+      if (!onboardingDone && loc != Routes.onboarding) {
+        return Routes.onboarding;
+      }
+      // 2. Onboarding terminé mais on est sur /onboarding → home
+      if (onboardingDone && loc == Routes.onboarding) {
+        return Routes.home;
+      }
+
+      // 3. Mode enfant actif : on force /madrasa
+      final kidsEnabled = ref.read(kidsModeProvider).kidsModeEnabled;
+      final isOnMadrasa = loc == Routes.madrasa;
+      if (kidsEnabled && !isOnMadrasa && loc != Routes.onboarding) {
+        return Routes.madrasa;
+      }
       if (!kidsEnabled && isOnMadrasa) return Routes.home;
       return null;
     },
     routes: [
+      // Onboarding (premier lancement)
+      GoRoute(
+        path: Routes.onboarding,
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: OnboardingPage()),
+      ),
       // Route plein écran hors shell : Madrasa
       GoRoute(
         path: Routes.madrasa,

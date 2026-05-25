@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/providers/reading_preferences_provider.dart';
+import '../../../../shared/widgets/fade_in_on_appear.dart';
 import '../../../audio_player/presentation/providers/audio_player_provider.dart';
 import '../../data/quran_repository.dart';
 import '../widgets/ayah_card.dart';
@@ -64,14 +65,23 @@ class SurahReaderPage extends ConsumerWidget {
             separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.lg),
             itemBuilder: (context, index) {
               if (index == 0) {
-                // Bismillah ou en-tête sourate
-                return _SurahHeader(surahName: surah.nameArabic);
+                return FadeInOnAppear(
+                  child: _SurahHeader(surahName: surah.nameArabic),
+                );
               }
               final verse = verses[index - 1];
               final translation = repo.translationOf(verse, translationLang);
-              return AyahCard(
-                verse: verse,
-                translation: translation,
+              // Cascade : seulement les 8 premiers versets ont une cascade
+              // visible (les suivants ne sont pas à l'écran au démarrage).
+              final delay = index <= 8
+                  ? Duration(milliseconds: 50 * index)
+                  : Duration.zero;
+              return FadeInOnAppear(
+                delay: delay,
+                child: AyahCard(
+                  verse: verse,
+                  translation: translation,
+                ),
               );
             },
           ),

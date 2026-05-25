@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../shared/widgets/haptics.dart';
 import '../../../quran_reader/data/quran_repository.dart';
 import '../../../quran_reader/domain/entities/surah.dart';
 import '../providers/kids_stars_provider.dart';
@@ -60,10 +61,16 @@ class _KidsQuizPageState extends ConsumerState<KidsQuizPage> {
 
   void _onAnswer(int idx) {
     if (_answered) return;
+    final isCorrect = idx == _questions[_currentIndex].correctIndex;
+    if (isCorrect) {
+      Haptics.success();
+    } else {
+      Haptics.error();
+    }
     setState(() {
       _selectedAnswer = idx;
       _answered = true;
-      if (idx == _questions[_currentIndex].correctIndex) {
+      if (isCorrect) {
         _correctCount++;
       }
     });

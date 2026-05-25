@@ -8,4 +8,5 @@ class Routes {
   static const murajaa = '/murajaa';
   static const settings = '/settings';
   static const madrasa = '/madrasa';
+  static const onboarding = '/onboarding';
 }

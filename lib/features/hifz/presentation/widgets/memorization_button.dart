@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../shared/widgets/haptics.dart';
 import '../../domain/memorization_status.dart';
 import '../providers/memorization_provider.dart';
 
@@ -60,6 +61,11 @@ class MemorizationButton extends ConsumerWidget {
               leading: Icon(_icon(s), color: _fgColor(s)),
               title: Text(_label(s)),
               onTap: () {
+                if (s == MemorizationStatus.memorized) {
+                  Haptics.success();
+                } else {
+                  Haptics.light();
+                }
                 controller.setStatus(globalIndex, s);
                 Navigator.of(ctx).pop();
               },

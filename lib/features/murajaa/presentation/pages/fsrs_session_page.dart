@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/providers/reading_preferences_provider.dart';
+import '../../../../shared/widgets/haptics.dart';
 import '../../../audio_player/presentation/providers/audio_player_provider.dart';
 import '../../../quran_reader/data/quran_repository.dart';
 import '../../../quran_reader/domain/entities/verse.dart';
@@ -56,6 +57,22 @@ class _FsrsSessionPageState extends ConsumerState<FsrsSessionPage> {
   }
 
   Future<void> _rate(FsrsRating rating) async {
+    // Haptic adapté au type d'évaluation
+    switch (rating) {
+      case FsrsRating.again:
+        Haptics.error();
+        break;
+      case FsrsRating.hard:
+        Haptics.light();
+        break;
+      case FsrsRating.good:
+        Haptics.medium();
+        break;
+      case FsrsRating.easy:
+        Haptics.success();
+        break;
+    }
+
     final verse = _initialQueue[_currentIndex];
     await ref
         .read(fsrsCardsProvider.notifier)
