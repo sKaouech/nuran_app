@@ -51,12 +51,15 @@ class MainScaffold extends StatelessWidget {
           NavigationBar(
             selectedIndex: selected,
             onDestinationSelected: (i) {
-              // Si on a empilé des pages par-dessus le shell (ex: une sourate
-              // ouverte en push), on les dépile avant de changer d'onglet.
-              // Sinon le tap sur un onglet semble "ne rien faire".
-              final root = Navigator.of(context, rootNavigator: true);
-              while (root.canPop()) {
-                root.pop();
+              // Quand des pages sont empilées par-dessus le shell (sourate
+              // ouverte en push, downloads, etc.), il faut les dépiler avant
+              // de changer d'onglet sinon le tap "ne fait rien".
+              //
+              // Le Navigator standard de Flutter (pas le rootNavigator de
+              // go_router) gère ces push MaterialPageRoute → on dépile dessus.
+              final nav = Navigator.of(context);
+              while (nav.canPop()) {
+                nav.pop();
               }
               context.go(_tabs[i].route);
             },

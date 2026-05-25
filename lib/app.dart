@@ -35,6 +35,18 @@ class NuranApp extends ConsumerWidget {
       supportedLocales: supportedLocales,
       localizationsDelegates: AppL10n.localizationsDelegates,
       routerConfig: router,
+      // Force la directionnalité de toute l'app à suivre la locale du
+      // provider, indépendamment de la locale système. Sans ce wrapper,
+      // sur un device avec la langue système en arabe, certains widgets
+      // (boutons, indicateurs, padding directionnel) restent en RTL même
+      // quand l'utilisateur a choisi français dans l'app.
+      builder: (context, child) {
+        final isRtl = locale.languageCode == 'ar';
+        return Directionality(
+          textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }

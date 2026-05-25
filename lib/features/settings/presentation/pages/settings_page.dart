@@ -8,6 +8,7 @@ import '../../../downloads/presentation/pages/downloads_page.dart';
 import '../../../kids/presentation/pages/parent_pin_page.dart';
 import '../../../kids/presentation/providers/kids_mode_provider.dart';
 import '../../../notifications/notifications_service.dart';
+import '../../../onboarding/presentation/providers/onboarding_provider.dart';
 import '../../../../shared/providers/locale_provider.dart';
 import '../../../../shared/providers/reading_preferences_provider.dart';
 import '../../../../shared/providers/theme_mode_provider.dart';
@@ -75,6 +76,8 @@ class SettingsPage extends ConsumerWidget {
           _NotificationsTile(),
           const Divider(),
           _KidsModeTile(),
+          const Divider(),
+          _ReplayOnboardingTile(),
         ],
       ),
     );
@@ -301,6 +304,44 @@ class _TajwidColorsTile extends ConsumerWidget {
       onChanged: (v) => ref
           .read(readingPreferencesProvider.notifier)
           .setTajwidColorsEnabled(v),
+    );
+  }
+}
+
+class _ReplayOnboardingTile extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      leading: const Icon(Icons.replay_outlined),
+      title: const Text('Revoir l\'onboarding'),
+      subtitle: const Text('Réafficher le tutoriel de bienvenue'),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () async {
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Revoir l\'onboarding ?'),
+            content: const Text(
+              'Vous serez redirigé vers les écrans de bienvenue. Vos données restent inchangées.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text('Annuler'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text('Revoir'),
+              ),
+            ],
+          ),
+        );
+        if (confirmed == true) {
+          // Le router écoute onboardingCompletedProvider et redirige
+          // automatiquement vers /onboarding quand l'état repasse à false.
+          await ref.read(onboardingCompletedProvider.notifier).reset();
+        }
+      },
     );
   }
 }

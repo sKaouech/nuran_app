@@ -9,6 +9,7 @@ import '../../../murajaa/presentation/providers/fsrs_provider.dart';
 import '../../../quran_reader/data/quran_repository.dart';
 import '../../../quran_reader/domain/entities/verse.dart';
 import '../../../stats/presentation/providers/activity_log_provider.dart';
+import '../../domain/phonetic_analysis.dart';
 import '../../domain/recitation_match.dart';
 import '../providers/asr_provider.dart';
 
@@ -86,6 +87,9 @@ class _RecitationCheckPageState extends ConsumerState<RecitationCheckPage> {
   }
 
   FsrsRating _ratingFromScore(int score) {
+    // Avec l'analyse niveau 2 (pondération phonétique 0.5), les seuils restent
+    // cohérents : un score ≥ 95 implique ~tous les mots parfaits ou presque,
+    // un score ≥ 80 admet quelques substitutions phonétiques mineures, etc.
     if (score >= 95) return FsrsRating.easy;
     if (score >= 80) return FsrsRating.good;
     if (score >= 50) return FsrsRating.hard;
@@ -432,22 +436,30 @@ class _AnnotatedWord extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Niveau 2 : 4 statuts dont `phonetic` (proche mais imparfait).
     final (bg, fg) = switch (match.status) {
       WordMatchStatus.correct => (
         AppColors.srs5.withValues(alpha: 0.18),
         AppColors.srs5,
       ),
-      WordMatchStatus.wrong => (
-        AppColors.warning.withValues(alpha: 0.2),
+      WordMatchStatus.phonetic => (
+        AppColors.warning.withValues(alpha: 0.18),
         AppColors.warning,
       ),
-      WordMatchStatus.missing => (
+      WordMatchStatus.wrong => (
         AppColors.error.withValues(alpha: 0.18),
+        AppColors.error,
+      ),
+      WordMatchStatus.missing => (
+        AppColors.error.withValues(alpha: 0.25),
         AppColors.error,
       ),
     };
 
-    return Container(
+    final faults = match.faults;
+    final tooltip = _buildTooltip();
+
+    final child = Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
         vertical: 4,
@@ -455,13 +467,54 @@ class _AnnotatedWord extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        border: faults.isNotEmpty
+            ? Border.all(color: fg.withValues(alpha: 0.4), width: 1)
+            : null,
       ),
-      child: Text(
-        match.expected,
-        style: AppTypography.ayahMedium(fg),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            match.expected,
+            style: AppTypography.ayahMedium(fg),
+          ),
+          if (faults.isNotEmpty) ...[
+            const SizedBox(width: 4),
+            Icon(_iconForFault(faults.first), size: 14, color: fg),
+          ],
+        ],
       ),
     );
+
+    if (tooltip == null) return child;
+    return Tooltip(
+      message: tooltip,
+      preferBelow: false,
+      child: child,
+    );
   }
+
+  String? _buildTooltip() {
+    if (match.status == WordMatchStatus.missing) {
+      return 'Mot non reconnu';
+    }
+    if (match.status == WordMatchStatus.wrong) {
+      return 'Reconnu : ${match.recognized ?? "—"}';
+    }
+    if (match.faults.isEmpty) return null;
+    final lines = <String>[
+      'Reconnu : ${match.recognized ?? "—"}',
+      ...match.faults.map((f) => '• ${f.label} — ${f.description}'),
+    ];
+    return lines.join('\n');
+  }
+
+  IconData _iconForFault(TajwidFault fault) => switch (fault) {
+        TajwidFault.maddShortened => Icons.compress,
+        TajwidFault.ghunnahMissed => Icons.air,
+        TajwidFault.qalqalahMissed => Icons.graphic_eq,
+        TajwidFault.phoneticSubstitution => Icons.swap_horiz,
+      };
 }
 
 class _ScoreCard extends StatelessWidget {
@@ -477,6 +530,7 @@ class _ScoreCard extends StatelessWidget {
         : score >= 60
             ? AppColors.warning
             : AppColors.error;
+    final faults = result.uniqueFaults.toList();
 
     return Container(
       width: double.infinity,
@@ -485,54 +539,121 @@ class _ScoreCard extends StatelessWidget {
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 60,
-            height: 60,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              '$score',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.lg),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  result.gradeLabel,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: color,
+          Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  '$score',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: Colors.white,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '${result.correctCount} / ${result.matches.length} mots corrects',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
+              ),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      result.gradeLabel,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: color,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    _BreakdownRow(result: result),
+                    Text(
+                      'Carte FSRS mise à jour automatiquement',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  'Carte FSRS mise à jour automatiquement',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
+          if (faults.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.md),
+            Divider(color: color.withValues(alpha: 0.2), height: 1),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'Points à travailler',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            ...faults.map((f) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(_iconForFault(f),
+                          size: 16, color: color),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          '${f.label} — ${f.description}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          ],
         ],
       ),
+    );
+  }
+
+  static IconData _iconForFault(TajwidFault fault) => switch (fault) {
+        TajwidFault.maddShortened => Icons.compress,
+        TajwidFault.ghunnahMissed => Icons.air,
+        TajwidFault.qalqalahMissed => Icons.graphic_eq,
+        TajwidFault.phoneticSubstitution => Icons.swap_horiz,
+      };
+}
+
+/// Ligne de breakdown : "12 ✓ · 3 ≈ · 1 ✗" pour montrer la répartition.
+class _BreakdownRow extends StatelessWidget {
+  const _BreakdownRow({required this.result});
+  final RecitationResult result;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    return Wrap(
+      spacing: 8,
+      children: [
+        Text('${result.correctCount} ✓', style: muted),
+        if (result.phoneticCount > 0)
+          Text('${result.phoneticCount} ≈',
+              style: muted?.copyWith(color: AppColors.warning)),
+        if (result.wrongCount > 0)
+          Text('${result.wrongCount} ✗',
+              style: muted?.copyWith(color: AppColors.error)),
+        if (result.missingCount > 0)
+          Text('${result.missingCount} —', style: muted),
+      ],
     );
   }
 }
