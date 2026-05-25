@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -24,6 +24,13 @@ class RiverpodListenable extends ChangeNotifier {
     }
   }
 }
+
+/// Clé du Navigator du shell. Exposée pour que MainScaffold puisse dépiler
+/// les pages poussées par-dessus le shell (SurahReaderPage, DownloadsPage,
+/// etc. — toutes celles push avec Navigator.of(context).push() depuis une
+/// page tab) avant de basculer vers un autre onglet.
+final GlobalKey<NavigatorState> shellNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 GoRouter buildRouter(Ref ref) {
   return GoRouter(
@@ -69,6 +76,7 @@ GoRouter buildRouter(Ref ref) {
       ),
       // Shell principal avec les 5 tabs
       ShellRoute(
+        navigatorKey: shellNavigatorKey,
         builder: (context, state, child) => MainScaffold(child: child),
         routes: [
           GoRoute(

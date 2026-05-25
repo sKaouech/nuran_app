@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nuran/core/localization/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/router/app_router.dart' show shellNavigatorKey;
 import '../../core/router/routes.dart';
 import '../../features/audio_player/presentation/widgets/mini_player.dart';
 
@@ -65,21 +66,17 @@ class _MainScaffoldState extends State<MainScaffold> {
           NavigationBar(
             selectedIndex: selected,
             onDestinationSelected: (i) {
-              // Dépiler TOUT ce qui a été poussé par-dessus le shell.
-              //
-              // Les MaterialPageRoute (SurahReaderPage, DownloadsPage, etc.)
-              // sont push sur le root navigator, alors que le shell est géré
-              // par go_router. On dépile donc les deux niveaux :
-              //  - rootNavigator pour les MaterialPageRoute
-              //  - navigator local pour go_router subroutes
-              final rootNav = Navigator.of(context, rootNavigator: true);
-              while (rootNav.canPop()) {
-                rootNav.pop();
+              // Dépiler les pages push par-dessus le shell. Les pages comme
+              // SurahReaderPage sont push avec Navigator.of(context) depuis
+              // QuranReaderPage, ce qui les pose sur le navigator INTERNE
+              // du shell (celui géré par go_router via shellNavigatorKey),
+              // pas le rootNavigator.
+              final shellNav = shellNavigatorKey.currentState;
+              if (shellNav != null) {
+                while (shellNav.canPop()) {
+                  shellNav.pop();
+                }
               }
-              // Toujours faire le go(), même si le path actuel est déjà
-              // sur le bon tab — c'est nécessaire car le path peut avoir
-              // dérivé si l'utilisateur naviguait entre tabs depuis une
-              // page push.
               context.go(_tabs[i].route);
             },
             destinations: [
